@@ -39,18 +39,12 @@
 			@pull_overlay="(...args) => { $emit('pull_overlay', ...args); }"
 			></calender-overlay>
 
-			<tr 
-			v-for="(time, i) in time_labels" 
-			:class="{ 'ds-minor': (time.indexOf(':') != -1) }" 
-			:key="i" 
-			:row-index="i">
-				<td scope='row'>{{ (time.indexOf(':30')==-1 || display_half_hour_labels) ? time : "" }}</td>
-				<td 
-				class="ds-slot" 
-				v-for="(slots, j) in mat" 
-				:key="j" 
-				:col-index="j"
-				:class="{ 'ds-avail':(mat_overlay[j][i]!=null) ? mat_overlay[j][i] : mat[j][i] }"></td>
+			<tr v-for="(time, i) in time_labels" :class="{ 'ds-minor': (time.indexOf(':') != -1) }" :key="i" :row-index="i">
+				<!-- <td scope='row'>{{ (time.indexOf(':30')==-1 || display_half_hour_labels) ? time : "" }}</td> -->
+				<td class='time-label'>
+						{{ (time == "12:00AM") ? "Midnight" : (time == "12:00PM") ? "Noon" : time }}
+					</td>
+				<td class="ds-slot" v-for="(slots, j) in mat" :key="j"  :col-index="j" :class="{ 'ds-avail':(mat_overlay[j][i]!=null) ? mat_overlay[j][i] : mat[j][i] }"></td>
 			</tr>
 		</table>
 	</div>
@@ -58,126 +52,93 @@
 </template>
 
 <style scoped>
-#calender {
-	margin: auto;
-	width: 100%;
-	height: 100%;
-	min-width: 500px;
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-}
-
-.ds-calender {
-	box-sizing: border-box;
-	overflow: auto;
-}
-
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
 	width: 100%;
-	border-color: #ddd;
-	border-width: 1px;
 	table-layout: fixed;
 	box-sizing: border-box;
 	height: 100%;
 }
-
-th {
-	min-height: 20px;
-	padding: 0;
-	margin: 0;
-	border: 1px solid #ddd;
-	box-sizing: border-box;
-	padding: 5px;
+.day-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
-
 td {
 	height: 20px;
 	min-height: 20px;
-	padding: 0;
+	padding: 0.5em 0;
 	margin: 0;
-	border-color: inherit;
-	border-width: 1px;
-	border-style: none solid;
+	border: none;
 	box-sizing: border-box;
 }
-
 tr [scope="row"], .placeholder {
-	width: 50px;
+	padding: 1em 0;
 	text-align: center;
 	overflow: hidden;
 }
-
-tr {
+th {
 	border: none;
-	border-style: none solid none solid;
-	border-color: inherit;
-	border-width: 1px;
+}
+tr {
 	box-sizing: border-box;
+	padding: 0.5em 0;
 }
-
-tr.ds-minor {
-	border-width: 1px;
-	border-style: dotted solid solid solid;
-}
-
 .ds-slot {
 	user-select: none;
+	background-color: #ABE1F6;
+	border: 5px solid white;
 }
-
+.ds-slot:hover {
+	background-color: #7ac2de;
+}
 .ds-avail {
-	background-color: green;
+	background-color: #006F9D !important;
 }
-
-.ds-today {
-	background-color: #fffacd87;
+.ds-avail:hover {
+	background-color: #59bae4;
 }
-
 .ds-nav {
 	margin: 0;
 	padding: 0;
-
 }
-
 .ds-nav > th {
 	padding: 0;
 	font-weight: normal;
 }
-
 .ds-control {
 	flex: 1 0;
 }
-
-.ds-nav-btn {
-	width: 10%;
-	user-select: none;
-	cursor: pointer;
-}
-
 .ds-nav-btn:hover {
 	background-color: #57a3f3;
 	color: white;
 }
-
 .ds-nav-btn:active {
 	background-color: #2b85e4;
 	color: white;
 }
-
 .ds-nav-info {
 	position: relative;
 	cursor: pointer;
 }
-
 .ds-nav-info:hover {
 	background-color: #f1f1f1;
 }
-
 .ds-nav-info p {
 	padding: 5px 0;
 }
+@media (max-width: 480px){ 
+  .wide {
+		width: 5em;
+	}
+	
+	.ds-avail:hover {
+		background-color: #006F9D;
+	}
+	.ds-slot:hover {
+		background-color: #ABE1F6;
+	}
+}
+
 </style>
 
 <script>
@@ -202,10 +163,14 @@ export default {
 			day_labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
 			cur_week: null, // [moment(), moment(), ...x7]
 			time_labels: [
-				"12am", "1am", "2am", "3am", "4am", "5am",
-				"6am", "7am", "8am", "9am", "10am", "11am",
-				"12pm", "1pm", "2pm", "3pm", "4pm", "5pm",
-				"6pm", "7pm", "8pm", "9pm", "10pm", "11pm"
+				// "12am", "1am", "2am", "3am", "4am", "5am",
+				// "6am", "7am", "8am", "9am", "10am", "11am",
+				// "12pm", "1pm", "2pm", "3pm", "4pm", "5pm",
+				// "6pm", "7pm", "8pm", "9pm", "10pm", "11pm"
+				"12:00 AM", "01:00 AM", "02:00 AM", "03:00 AM", "04:00 AM", "05:00 AM",
+				"06:00 AM", "07:00 AM", "08:00 AM", "09:00 AM", "10:00 AM", "11:00 AM",
+				"12:00 PM", "01:00 PM", "02:00 PM", "03:00 PM", "04:00 PM", "05:00 PM",
+				"06:00 PM", "07:00 PM", "08:00 PM", "09:00 PM", "10:00 PM", "11:00 PM"
 			],
 			half_hour_labels: true, // include half-hour labels in time_labels
 			display_half_hour_labels: false, // show half-hour label name
@@ -230,7 +195,7 @@ export default {
 			this.cur_week = week;
 
 			// render view
-			this.loadData();
+			// this.loadData();
 		},
 
 		// Convert current view to span data and then save it 
@@ -365,12 +330,12 @@ export default {
 
 	created() {
 		// generate half hour labels
-		if (this.half_hour_labels) {
-			var re = /(\d+)(am|pm)/;
-			this.time_labels = this.time_labels.reduce((accu, curv, curi) => {
-				return accu.concat(curv, curv.replace(re, '$1:30$2'));
-			}, []);
-		}
+		// if (this.half_hour_labels) {
+		// 	var re = /(\d+)(am|pm)/;
+		// 	this.time_labels = this.time_labels.reduce((accu, curv, curi) => {
+		// 		return accu.concat(curv, curv.replace(re, '$1:30$2'));
+		// 	}, []);
+		// }
 		// console.log(this.time_labels);
 
 		// generate time slot matrix (column major)
